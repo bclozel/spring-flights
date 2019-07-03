@@ -1,5 +1,6 @@
 pluginManagement {
 	repositories {
+		mavenLocal()
 		maven { url 'https://repo.spring.io/snapshot' }
 		maven { url 'https://repo.spring.io/milestone' }
 		gradlePluginPortal()
@@ -12,4 +13,5 @@ pluginManagement {
 		}
 	}
 }
-rootProject.name = 'radar-collector'
+rootProject.name = 'spring-flights'
+include 'radar-collector', 'flight-client', 'flight-tracker'
