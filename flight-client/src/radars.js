@@ -14,8 +14,10 @@ export class RadarClient {
                 metadata: IdentitySerializer,
             },
             setup: {
-                keepAlive: 60000,
-                lifetime: 180000,
+                // ms btw sending keepalive to server
+                keepAlive: 10000,
+                // ms timeout if no keepalive response
+                lifetime: 20000,
                 dataMimeType: 'application/json',
                 metadataMimeType: 'message/x.rsocket.routing.v0',
             },
