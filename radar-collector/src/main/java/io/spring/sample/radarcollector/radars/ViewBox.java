@@ -10,6 +10,9 @@ public class ViewBox {
 
 	private LatLng second;
 
+	public ViewBox() {
+	}
+
 	public ViewBox(LatLng first, LatLng second) {
 		this.first = first;
 		this.second = second;
