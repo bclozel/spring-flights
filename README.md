@@ -7,6 +7,23 @@ This application is made of 3 modules:
 * `radar-collector`, an app that provides information about radars and the aircraft signals they collect.
 * `flight-tracker` and `flight-client`, an app that displays an interactive map with radars and aircrafts.
 
+### Running the applications
+
+First, run the collector application:
+
+```
+$ ./gradlew :radar-collector:build
+$ java -jar radar-collector/build/libs/radar-collector-0.0.1-SNAPSHOT.jar
+```
+
+Then, run the tracker web application:
+```
+$ ./gradlew :flight-tracker:build
+$ java -jar flight-tracker/build/libs/flight-tracker-0.0.1-SNAPSHOT.jar
+```
+
+The tracker application is available at `http://localhost:8080/index.html`
+
 ### Radar Collector
 
 This application is providing information about radars (here, airports): their IATA code, location
