@@ -43,7 +43,7 @@ public class RadarService {
 
 	private Flux<AircraftSignal> listenAircraftSignals(Radar radar) {
 		return this.requester.flatMapMany(req ->
-				req.route(String.format("listen.radar.%s", radar.getIata()))
+				req.route("listen.radar.{iata}", radar.getIata())
 						.data(Mono.empty())
 						.retrieveFlux(AircraftSignal.class));
 	}
