@@ -2,6 +2,8 @@ package io.spring.sample.radarcollector.radars;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.springframework.data.geo.Point;
+
 public class LatLng {
 
 	private double lat;
@@ -40,6 +42,10 @@ public class LatLng {
 
 	public void setLng(double lng) {
 		this.lng = lng;
+	}
+
+	public Point toPoint() {
+		return new Point(getLng(), getLat());
 	}
 
 	@Override
