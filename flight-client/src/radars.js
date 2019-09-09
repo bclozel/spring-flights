@@ -1,9 +1,21 @@
 import {
     RSocketClient,
     JsonSerializer,
-    IdentitySerializer
+    IdentitySerializer,
+    BufferEncoder,
+    UTF8Encoder
 } from 'rsocket-core';
 import RSocketWebSocketClient from 'rsocket-websocket-client';
+import {RoutingMetadataSerializer} from './metadata'
+
+const CustomEncoders = {
+    data: UTF8Encoder,
+    dataMimeType: UTF8Encoder,
+    message: UTF8Encoder,
+    metadata: BufferEncoder,
+    metadataMimeType: UTF8Encoder,
+    resumeToken: UTF8Encoder,
+};
 
 export class RadarClient {
 
@@ -11,7 +23,7 @@ export class RadarClient {
         this.client = new RSocketClient({
             serializers: {
                 data: JsonSerializer,
-                metadata: IdentitySerializer,
+                metadata: new RoutingMetadataSerializer(),
             },
             setup: {
                 // ms btw sending keepalive to server
@@ -19,9 +31,9 @@ export class RadarClient {
                 // ms timeout if no keepalive response
                 lifetime: 20000,
                 dataMimeType: 'application/json',
-                metadataMimeType: 'message/x.rsocket.routing.v0',
+                metadataMimeType: RoutingMetadataSerializer.MIME_TYPE,
             },
-            transport: new RSocketWebSocketClient({url: url}),
+            transport: new RSocketWebSocketClient({url: url}, CustomEncoders),
             responder: responder
         });
     }
