@@ -39,7 +39,7 @@ public class RadarsController {
 	public Flux<AircraftSignal> listenToRadar(@DestinationVariable String iata) {
 		return this.airportRepository
 				.findByIata(iata.toUpperCase())
-				.flatMapMany(airport -> this.generator.aircraftTraces(new AirportRadar(airport)))
+				.flatMapMany(this.generator::generateForAirport)
 				.map(AircraftSignal::new);
 	}
 

@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import io.spring.sample.radarcollector.airports.Airport;
 import reactor.core.publisher.Flux;
 
 import org.springframework.stereotype.Component;
@@ -15,37 +16,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class AircraftTraceGenerator {
 
-	private final Duration updateInterval;
+	private static final Duration UPDATE_INTERVAL = Duration.ofMillis(1000);
 
 	private final LoadingCache<AirportRadar, Flux<AircraftTrace>> traces;
 
 	public AircraftTraceGenerator() {
-		this.updateInterval = Duration.ofMillis(1000);
 		this.traces = Caffeine.newBuilder()
 				.maximumSize(1_000)
 				.expireAfterAccess(2, TimeUnit.MINUTES)
-				.build(this::createAircraftTrace);
+				.build(AircraftTraceGenerator::createAircraftTrace);
+	}
+
+	private static Flux<AircraftTrace> createAircraftTrace(AirportRadar radar) {
+		return Flux.interval(UPDATE_INTERVAL)
+				.flatMapIterable(aLong -> {
+					LocalDateTime now = LocalDateTime.now();
+					Instant instant = now.withSecond((now.getSecond())).withNano(0).toInstant(ZoneOffset.UTC);
+					return radar.updateTraces(instant);
+				})
+				.share();
 	}
 
 
-	public Flux<AircraftTrace> aircraftTraces(AirportRadar radar) {
+	public Flux<AircraftTrace> generateForAirport(Airport airport) {
+		AirportRadar radar = new AirportRadar(airport);
 		return this.traces.get(radar);
-	}
-
-	private Flux<AircraftTrace> createAircraftTrace(AirportRadar radar) {
-		 return Flux.interval(updateInterval)
-				 .flatMap(i -> {
-					 Instant now = generateCurrentTimestamp();
-					 return Flux.fromIterable(radar.updateTraces(now));
-				 })
-				 .share();
-	}
-
-	private Instant generateCurrentTimestamp() {
-		LocalDateTime now = LocalDateTime.now();
-		return now.withSecond((now.getSecond()))
-				.withNano(0)
-				.toInstant(ZoneOffset.UTC);
 	}
 
 }

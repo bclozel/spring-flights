@@ -26,9 +26,9 @@ The tracker application is available at `http://localhost:8080/index.html`
 
 ### Radar Collector
 
-This application is providing information about radars (here, airports): their IATA code, location
- and aircraft signals recorded. The aircraft signals are randomly generated and the actual list
-of radars is actually created from a list of airports, inserted in a MongoDB database.
+This application is providing information about radars (actually populated from list of airports):
+their IATA code, location and aircraft signals recorded. The aircraft signals are randomly
+generated and the list of radars is inserted in a MongoDB database.
 
 The application starts an RSocket server with TCP transport, at `localhost:9898`.
 

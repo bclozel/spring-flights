@@ -1,7 +1,6 @@
 package io.spring.sample.radarcollector.radars;
 
 import org.springframework.data.geo.Box;
-import org.springframework.data.geo.Point;
 
 
 public class ViewBox {
@@ -27,7 +26,7 @@ public class ViewBox {
 	}
 
 	public Box toGeoBox() {
-		return new Box(new Point(this.first.getLng(), this.first.getLat()),
-				new Point(this.second.getLng(), this.second.getLat()));
+		return new Box(this.first.toPoint(), this.second.toPoint());
 	}
+
 }
