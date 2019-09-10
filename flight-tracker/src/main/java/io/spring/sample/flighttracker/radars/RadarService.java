@@ -2,6 +2,8 @@ package io.spring.sample.flighttracker.radars;
 
 import java.util.List;
 
+import org.springframework.security.rsocket.metadata.BasicAuthenticationEncoder;
+import org.springframework.security.rsocket.metadata.UsernamePasswordMetadata;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +19,8 @@ public class RadarService {
 	public RadarService(RSocketRequester.Builder builder) {
 		this.requesterMono = builder
 				.dataMimeType(MediaType.APPLICATION_CBOR)
+				.setupMetadata(new UsernamePasswordMetadata("user", "password"), UsernamePasswordMetadata.BASIC_AUTHENTICATION_MIME_TYPE)
+				.rsocketStrategies(s -> s.encoder(new BasicAuthenticationEncoder()))
 				.connectTcp("localhost", 9898).retry(5).cache();
 	}
 
