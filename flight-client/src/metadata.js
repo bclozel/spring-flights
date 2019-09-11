@@ -10,7 +10,10 @@ import {
 export class RoutingMetadataSerializer {
 
     deserialize(data) {
-        throw 'Not implemented!';
+        if (data == null) {
+            return null;
+        }
+        return data.toString('utf8', 1, data.length);
     }
 
     serialize(data) {
