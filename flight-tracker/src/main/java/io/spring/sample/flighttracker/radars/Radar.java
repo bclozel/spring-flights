@@ -6,6 +6,14 @@ public class Radar {
 
 	private String code;
 
+	public Radar() {
+	}
+
+	public Radar(String type, String code) {
+		this.type = type;
+		this.code = code;
+	}
+
 	public String getType() {
 		return type;
 	}
