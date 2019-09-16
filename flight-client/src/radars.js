@@ -1,21 +1,6 @@
-import {
-    RSocketClient,
-    JsonSerializer,
-    IdentitySerializer,
-    BufferEncoder,
-    UTF8Encoder
-} from 'rsocket-core';
+import {RSocketClient, JsonSerializer} from 'rsocket-core';
 import RSocketWebSocketClient from 'rsocket-websocket-client';
-import {RoutingMetadataSerializer} from './metadata'
-
-const CustomEncoders = {
-    data: UTF8Encoder,
-    dataMimeType: UTF8Encoder,
-    message: UTF8Encoder,
-    metadata: BufferEncoder,
-    metadataMimeType: UTF8Encoder,
-    resumeToken: UTF8Encoder,
-};
+import {Metadata, JsonMetadataSerializer} from './metadata'
 
 export class RadarClient {
 
@@ -23,7 +8,7 @@ export class RadarClient {
         this.client = new RSocketClient({
             serializers: {
                 data: JsonSerializer,
-                metadata: new RoutingMetadataSerializer(),
+                metadata: JsonMetadataSerializer,
             },
             setup: {
                 // ms btw sending keepalive to server
@@ -31,9 +16,9 @@ export class RadarClient {
                 // ms timeout if no keepalive response
                 lifetime: 20000,
                 dataMimeType: 'application/json',
-                metadataMimeType: RoutingMetadataSerializer.MIME_TYPE,
+                metadataMimeType: JsonMetadataSerializer.MIME_TYPE,
             },
-            transport: new RSocketWebSocketClient({url: url}, CustomEncoders),
+            transport: new RSocketWebSocketClient({url: url}),
             responder: responder
         });
     }
@@ -50,16 +35,20 @@ export class RadarClient {
     }
 
     locateRadars(x, y, max) {
+        let metadata = new Metadata();
+        metadata.set(Metadata.ROUTE, 'locate.radars.within');
         return this.socket.requestStream({
             data: {viewBox: {first: x, second: y}, maxRadars: max},
-            metadata: 'locate.radars.within',
+            metadata: metadata,
         });
     }
 
     streamAircraftPositions(airports) {
+        let metadata = new Metadata();
+        metadata.set(Metadata.ROUTE, 'locate.aircrafts.for');
         return this.socket.requestStream({
             data: airports,
-            metadata: 'locate.aircrafts.for',
+            metadata: metadata,
         });
     }
 

@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-rotatedmarker/leaflet.rotatedMarker'
 import planeImg from './img/airplane.png';
 import radarImg from './img/satellite-dish.png';
+import {Metadata} from "./metadata";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -216,7 +217,7 @@ class MapHandler {
     }
 
     fireAndForget(payload) {
-        if(payload.metadata === "send.to.location") {
+        if(typeof payload.metadata == Metadata  && payload.metadata.get(Metadata.ROUTE) == "send.to.location") {
             const radar = payload.data;
             this.map.panTo([radar.location.lat, radar.location.lng]);
         }

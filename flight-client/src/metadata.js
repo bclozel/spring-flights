@@ -1,32 +1,47 @@
 import {
-    createBuffer,
-    byteLength
+    JsonSerializer
 } from 'rsocket-core';
 
-/**
- * Serializer for Routing metadata
- * @see https://github.com/rsocket/rsocket/blob/master/Extensions/Routing.md
- */
-export class RoutingMetadataSerializer {
+export class Metadata extends Map {
+
+    constructor(json) {
+        super();
+        if (json != null) {
+            for (let [key, value] of json) {
+                this.set(key, value);
+            }
+        }
+    }
+
+    toJSON() {
+        const result = {};
+        for (let [key, value] of this.entries()) {
+            result[key] = value;
+        }
+        return result;
+    }
+
+}
+Metadata.ROUTE = "route";
+Metadata.AUTHENTICATION_BEARER = "message/x.rsocket.authentication.bearer.v0";
+
+export const JsonMetadataSerializer = {
 
     deserialize(data) {
         if (data == null) {
             return null;
         }
-        return data.toString('utf8', 1, data.length);
-    }
+        let json = JsonSerializer.deserialize(data);
+        return new Metadata(json);
+    },
 
-    serialize(data) {
-        if (data == null) {
+    serialize(metadata) {
+        if (metadata == null) {
             return null;
         }
-        let dataLength = byteLength(data, 'utf8');
-        let outBuffer = createBuffer(1 + dataLength);
-        outBuffer.writeUInt8(dataLength, 0);
-        outBuffer.write(data, 1, data.length, 'utf8');
-        return outBuffer;
+        let json = metadata.toJSON();
+        return JsonSerializer.serialize(json);
     }
-}
 
-RoutingMetadataSerializer.MIME_TYPE = "message/x.rsocket.routing.v0";
-RoutingMetadataSerializer.MIME_TYPE_ID = 0x7E;
+};
+JsonMetadataSerializer.MIME_TYPE = "application/vnd.spring.rsocket.metadata+json";
