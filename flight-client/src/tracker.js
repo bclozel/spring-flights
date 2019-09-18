@@ -1,6 +1,7 @@
 import {RSocketClient, JsonSerializer} from 'rsocket-core';
 import RSocketWebSocketClient from 'rsocket-websocket-client';
 import {Metadata, JsonMetadataSerializer} from './metadata'
+import {SecurityService} from "./security";
 
 export class TrackerClient {
 
@@ -21,19 +22,22 @@ export class TrackerClient {
             transport: new RSocketWebSocketClient({url: url}),
             responder: responder
         });
+        this.securityService = new SecurityService();
     }
 
     connect(cb) {
-        return new Promise(((resolve, reject) => {
-            this.client.connect().subscribe({
-                onComplete: s => {
-                    this.socket = s;
-                    resolve(this.socket);
-                },
-                onError: error => reject(error),
-                onSubscribe: cancel => { this.cancel = cancel}
-            });
-        }));
+        return this.securityService.init().then(() => {
+            return new Promise(((resolve, reject) => {
+                this.client.connect().subscribe({
+                    onComplete: s => {
+                        this.socket = s;
+                        resolve(this.socket);
+                    },
+                    onError: error => reject(error),
+                    onSubscribe: cancel => { this.cancel = cancel}
+                });
+            }));
+        });
     }
 
     locateRadars(x, y, max) {
@@ -41,6 +45,7 @@ export class TrackerClient {
         return new Promise(((resolve, reject) => {
             let metadata = new Metadata();
             metadata.set(Metadata.ROUTE, 'locate.radars.within');
+            metadata.set(Metadata.AUTHENTICATION_BEARER, this.securityService.getToken());
             return this.socket.requestStream({
                 data: {viewBox: {first: x, second: y}, maxRadars: max},
                 metadata: metadata,
@@ -56,6 +61,7 @@ export class TrackerClient {
     streamAircraftPositions(airports) {
         let metadata = new Metadata();
         metadata.set(Metadata.ROUTE, 'locate.aircrafts.for');
+        metadata.set(Metadata.AUTHENTICATION_BEARER, this.securityService.getToken());
         return this.socket.requestStream({
             data: airports,
             metadata: metadata,
@@ -66,6 +72,7 @@ export class TrackerClient {
         return new Promise((resolve, reject) => {
             let metadata = new Metadata();
             metadata.set(Metadata.ROUTE, `locate.radar.${code}`);
+            metadata.set(Metadata.AUTHENTICATION_BEARER, this.securityService.getToken());
             this.socket.requestResponse({
                 metadata: metadata,
             }).subscribe({
@@ -83,6 +90,7 @@ export class TrackerClient {
         return new Promise((resolve, reject) => {
             let metadata = new Metadata();
             metadata.set(Metadata.ROUTE, `fetch.profile.${login}`);
+            metadata.set(Metadata.AUTHENTICATION_BEARER, this.securityService.getToken());
             this.socket.requestResponse({
                 metadata: metadata,
             }).subscribe({
