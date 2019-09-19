@@ -23,7 +23,6 @@ public class RadarService {
 	public Mono<AirportLocation> findRadar(String iata) {
 		return this.requesterMono.flatMap(req ->
 				req.route("find.radar.{iata}", iata)
-						.data(Mono.empty())
 						.retrieveMono(AirportLocation.class));
 	}
 
@@ -40,7 +39,6 @@ public class RadarService {
 		return this.requesterMono.flatMapMany(req ->
 				Flux.fromIterable(radars).flatMap(radar ->
 						req.route("listen.radar.{iata}", radar.getIata())
-								.data(Mono.empty())
 								.retrieveFlux(AircraftSignal.class)));
 	}
 }
