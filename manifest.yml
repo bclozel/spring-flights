@@ -1,0 +1,13 @@
+---
+applications:
+  - name: radar-collector
+    routes:
+      - route: ((cf.route.tcp.domain)):((cf.route.tcp.port))
+    path: radar-collector/build/libs/radar-collector-0.0.1-SNAPSHOT.jar
+  - name: flight-tracker
+    routes:
+      - route: flight-tracker.((cf.route.http.domain))
+    path: flight-tracker/build/libs/flight-tracker-0.0.1-SNAPSHOT.jar
+    env:
+      RADAR-SERVICE_HOST: ((cf.route.tcp.domain))
+      RADAR-SERVICE_PORT: ((cf.route.tcp.port))

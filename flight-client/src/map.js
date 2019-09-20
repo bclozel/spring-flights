@@ -7,6 +7,14 @@ import radarImg from './img/satellite-dish.png';
 import militaryRadarImg from './img/radar.png';
 import {Metadata} from "./metadata";
 
+let FLIGHT_TRACKER_URL = 'ws://localhost:8080/rsocket';
+try {
+    FLIGHT_TRACKER_URL = require("./config").FLIGHT_TRACKER_URL;
+    console.log('Loaded config. FLIGHT_TRACKER_URL=' + FLIGHT_TRACKER_URL)
+} catch(e) {
+    console.log('No config found. Default FLIGHT_TRACKER_URL=' + FLIGHT_TRACKER_URL)
+}
+
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
@@ -57,7 +65,7 @@ export class RadarMap {
         this.signalsLayer = L.layerGroup();
         this.signalsLayer.addTo(this.map);
 
-        this.radarClient = new RadarClient('ws://localhost:8080/rsocket', new MapHandler(this.map));
+        this.radarClient = new RadarClient(FLIGHT_TRACKER_URL, new MapHandler(this.map));
         this.radarClient.connect(() => this.connectCallback());
 
         this.backpressureCtrl = new L.Control.BackpressureCtrl();

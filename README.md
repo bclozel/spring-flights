@@ -86,3 +86,30 @@ to let them know that they should change their location to the selected radar:
 ```
 curl -X POST localhost:8080/location/CDG
 ```
+
+### Deploy to Cloud Foundry
+
+Use the `cf` CLI to target your instance of Cloud Foundry.
+
+Open the file called `manifest-vars.yml` and edit the domains as appropriate for your Cloud Foundry foundation. You can run the command `cf domains` to see the domains available to you.
+
+Next, you need to provide flight-client with the correct URL to flight-tracker on Cloud Foundry (otherwise, the URL defaults to `ws://localhost:8080/rsocket`).
+Run the following following script and enter the appropriate URL when prompted. 
+You can copy/paste the sample value provided by the script - just change the domain as necessary.
+```
+$ ./config-client.sh
+```
+
+Build the radar-collector and flight-client apps.
+Please note that even if you built the projects earlier in this exercise, you must re-build flight-client to incorporate the change in the last step.
+```
+./gradlew :radar-collector:build
+./gradlew :flight-tracker:build
+```
+
+Push the apps to Cloud Foundry, providing `manifest-vars.yml` as input:
+```
+cf push --vars-file manifest-vars.yml
+```
+
+The tracker application is available at `http://flight-tracker.<YOUR-DOMAIN>/index.html`

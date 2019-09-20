@@ -2,6 +2,7 @@ package io.spring.sample.flighttracker.radars;
 
 import java.util.List;
 
+import org.springframework.core.env.Environment;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,10 +15,12 @@ public class RadarService {
 
 	private final Mono<RSocketRequester> requesterMono;
 
-	public RadarService(RSocketRequester.Builder builder) {
+	public RadarService(RSocketRequester.Builder builder, Environment env) {
+		String host = env.getProperty("radar-service.host", "localhost");
+		int port = env.getProperty("radar-service.port", Integer.class, 9898);
 		this.requesterMono = builder
 				.dataMimeType(MediaType.APPLICATION_CBOR)
-				.connectTcp("localhost", 9898).retry(5).cache();
+				.connectTcp(host, port).retry(5).cache();
 	}
 
 	public Mono<AirportLocation> findRadar(String type, String code) {

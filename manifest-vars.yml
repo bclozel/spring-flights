@@ -1,0 +1,7 @@
+cf:
+  route:
+    tcp:
+      domain: tcp.clearlake.cf-app.com
+      port: 1100
+    http:
+      domain: apps.clearlake.cf-app.com
