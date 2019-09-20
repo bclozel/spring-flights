@@ -1,6 +1,7 @@
 package io.spring.sample.radarcollector.radars;
 
 import io.spring.sample.radarcollector.airports.AirportRepository;
+import io.spring.sample.radarcollector.airports.AirportType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,17 +29,19 @@ public class RadarsController {
 				.map(AirportLocation::new);
 	}
 
-	@MessageMapping("find.radar.{iata}")
-	public Mono<AirportLocation> findRadar(@DestinationVariable String iata) {
+	@MessageMapping("find.radar.{type}.{code}")
+	public Mono<AirportLocation> findRadar(@DestinationVariable String type, @DestinationVariable String code) {
+		AirportType airportType = AirportType.valueOf(type);
 		return this.airportRepository
-				.findByIata(iata)
+				.findByTypeAndCode(airportType, code.toUpperCase())
 				.map(AirportLocation::new);
 	}
 
-	@MessageMapping("listen.radar.{iata}")
-	public Flux<AircraftSignal> listenToRadar(@DestinationVariable String iata) {
+	@MessageMapping("listen.radar.{type}.{code}")
+	public Flux<AircraftSignal> listenToRadar(@DestinationVariable String type, @DestinationVariable String code) {
+		AirportType airportType = AirportType.valueOf(type);
 		return this.airportRepository
-				.findByIata(iata.toUpperCase())
+				.findByTypeAndCode(airportType, code.toUpperCase())
 				.flatMapMany(this.generator::generateForAirport)
 				.map(AircraftSignal::new);
 	}

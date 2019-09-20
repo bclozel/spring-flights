@@ -34,7 +34,7 @@ public class AirportRadar {
 
 	public AirportRadar(Airport airport, double range, int aircraftCount) {
 		this.name = airport.getName();
-		this.iata = airport.getIata();
+		this.iata = airport.getCode();
 		this.location = new LatLng(airport.getLocation().getY(), airport.getLocation().getX());
 		this.range = range;
 		this.aircraftCount = aircraftCount;

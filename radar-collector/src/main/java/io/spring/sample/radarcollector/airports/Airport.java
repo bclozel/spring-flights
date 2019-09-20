@@ -10,18 +10,22 @@ public class Airport {
 	@Id
 	private String id;
 
-	private String name;
+	private AirportType type;
 
-	private String iata;
+	private String code;
+
+	private String name;
 
 	private GeoJsonPoint location;
 
 	public Airport() {
 	}
 
-	public Airport(String name, String iata, GeoJsonPoint location) {
+	public Airport(String id, AirportType type, String code, String name, GeoJsonPoint location) {
+		this.id = id;
+		this.type = type;
+		this.code = code;
 		this.name = name;
-		this.iata = iata;
 		this.location = location;
 	}
 
@@ -33,20 +37,28 @@ public class Airport {
 		this.id = id;
 	}
 
+	public AirportType getType() {
+		return type;
+	}
+
+	public void setType(AirportType type) {
+		this.type = type;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getIata() {
-		return iata;
-	}
-
-	public void setIata(String iata) {
-		this.iata = iata;
 	}
 
 	public GeoJsonPoint getLocation() {
@@ -60,8 +72,9 @@ public class Airport {
 	@Override
 	public String toString() {
 		return "Airport{" +
-				"name='" + name + '\'' +
-				", iata='" + iata + '\'' +
+				"id='" + id + '\'' +
+				", type=" + type +
+				", code='" + code + '\'' +
 				'}';
 	}
 }

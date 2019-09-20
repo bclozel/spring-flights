@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-rotatedmarker/leaflet.rotatedMarker'
 import planeImg from './img/airplane.png';
 import radarImg from './img/satellite-dish.png';
+import militaryRadarImg from './img/radar.png';
 import {Metadata} from "./metadata";
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -26,8 +27,14 @@ const radarIcon = L.icon({
     popupAnchor: [-3, -76],
     shadowUrl: ''
 });
+const militaryRadarIcon = L.icon({
+    iconUrl: militaryRadarImg,
+    iconSize: [64, 64],
+    popupAnchor: [-3, -76],
+    shadowUrl: ''
+});
 
-const maxRadars = 5;
+const maxRadars = 6;
 
 
 export class RadarMap {
@@ -90,7 +97,7 @@ export class RadarMap {
                 },
                 onComplete: () => {
                     const radars = this.radars.map(v => {
-                        const radar = {iata: v.iata};
+                        const radar = {type: v.type, code: v.code};
                         return radar;
                     });
                     this.radarClient
@@ -166,13 +173,23 @@ L.Control.BackpressureCtrl = L.Control.extend({
 class Radar {
 
     constructor(radar) {
-        this.iata = radar.iata;
+        this.type = radar.type;
+        this.code = radar.code;
         this.name = radar.name;
         this.location = radar.location;
         this.marker = L.marker(
             [radar.location.lat, radar.location.lng],
-            {title: this.iata, icon: radarIcon}
-        ).bindPopup(`${this.iata} ${this.name}`);
+            {title: this.code, icon: this.getIcon(radar)}
+        ).bindPopup(`${this.type} ${this.code} ${this.name}`);
+    }
+
+    getIcon(radar) {
+        if (radar.type == "CIVILIAN") {
+            return radarIcon;
+        } else if (radar.type == "MILITARY") {
+            return militaryRadarIcon;
+        }
+        return radarIcon;
     }
 
     addToLayer(layer) {

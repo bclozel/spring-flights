@@ -20,9 +20,9 @@ public class RadarService {
 				.connectTcp("localhost", 9898).retry(5).cache();
 	}
 
-	public Mono<AirportLocation> findRadar(String iata) {
+	public Mono<AirportLocation> findRadar(String type, String code) {
 		return this.requesterMono.flatMap(req ->
-				req.route("find.radar.{iata}", iata)
+				req.route("find.radar.{type}.{code}", type, code)
 						.retrieveMono(AirportLocation.class));
 	}
 
@@ -38,7 +38,7 @@ public class RadarService {
 	public Flux<AircraftSignal> streamAircraftSignals(List<Radar> radars) {
 		return this.requesterMono.flatMapMany(req ->
 				Flux.fromIterable(radars).flatMap(radar ->
-						req.route("listen.radar.{iata}", radar.getIata())
+						req.route("listen.radar.{type}.{code}", radar.getType(), radar.getCode())
 								.retrieveFlux(AircraftSignal.class)));
 	}
 }

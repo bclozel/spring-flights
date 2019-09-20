@@ -48,14 +48,14 @@ public class RadarsController {
 				});
 	}
 
-	@PostMapping("/location/{iata}")
+	@PostMapping("/location/{type}/{code}")
 	@ResponseBody
-	public Mono<String> sendClientsToLocation(@PathVariable String iata) {
-		return this.radarService.findRadar(iata)
+	public Mono<String> sendClientsToLocation(@PathVariable String type, @PathVariable String code) {
+		return this.radarService.findRadar(type, code)
 				.flatMapMany(radar ->
 						Flux.fromIterable(this.connectedClients)
 								.flatMap(requester -> sendRadarLocation(requester, radar)))
-				.then(Mono.just("Sent clients to location " + iata));
+				.then(Mono.just("Sent clients to location " + type + " " + code));
 	}
 
 	private Mono<Void> sendRadarLocation(RSocketRequester requester, AirportLocation radar) {

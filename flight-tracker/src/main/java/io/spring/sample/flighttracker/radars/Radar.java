@@ -2,13 +2,23 @@ package io.spring.sample.flighttracker.radars;
 
 public class Radar {
 
-	private String iata;
+	private String type;
 
-	public String getIata() {
-		return iata;
+	private String code;
+
+	public String getType() {
+		return type;
 	}
 
-	public void setIata(String iata) {
-		this.iata = iata;
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 }

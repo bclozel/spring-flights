@@ -2,32 +2,40 @@ package io.spring.sample.radarcollector.airports;
 
 public class AirportsFileEntry {
 
-	private String iata;
+	private String id;
 
-	private boolean opened;
+	private String type;
+
+	private String code;
 
 	private String name;
-
-	private String continent;
 
 	private double lat;
 
 	private double lon;
 
-	public String getIata() {
-		return iata;
+	public String getId() {
+		return id;
 	}
 
-	public void setIata(String iata) {
-		this.iata = iata;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public boolean isOpened() {
-		return opened;
+	public String getType() {
+		return type;
 	}
 
-	public void setOpened(boolean opened) {
-		this.opened = opened;
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {
@@ -36,14 +44,6 @@ public class AirportsFileEntry {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getContinent() {
-		return continent;
-	}
-
-	public void setContinent(String continent) {
-		this.continent = continent;
 	}
 
 	public double getLat() {

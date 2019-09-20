@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 public interface AirportRepository extends ReactiveMongoRepository<Airport, String> {
 
-	Mono<Airport> findByIata(String iata);
+	Mono<Airport> findByTypeAndCode(AirportType type, String code);
 
 	Flux<Airport> findByLocationNear(Point point, Pageable pageable);
 
