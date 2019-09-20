@@ -26,7 +26,7 @@ public class JsonMetadataStrategiesCustomizer implements RSocketStrategiesCustom
 
 	@Override
 	public void customize(RSocketStrategies.Builder strategies) {
-		strategies.metadataExtractors(registry -> {
+		strategies.metadataExtractorRegistry(registry -> {
 			registry.metadataToExtract(METADATA_MIME_TYPE, METADATA_TYPE, (in, map) -> {
 				map.putAll(in);
 			});
