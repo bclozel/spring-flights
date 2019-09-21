@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Box;
@@ -40,6 +41,12 @@ public class AirportRepositoryInitializer {
 		this.objectMapper = objectMapper;
 	}
 
+	@Value("${airports.filter.id:}")
+	String idFilter;
+
+	@Value("${airports.filter.type:}")
+	String typeFilter;
+
 	@PostConstruct
 	public void initializeAirportsDatabase() throws IOException {
 		if (!this.template.collectionExists(Airport.class)) {
@@ -53,13 +60,15 @@ public class AirportRepositoryInitializer {
 					.readValue(airportsResource.getInputStream(), AirportsFileEntry[].class);
 
 			List<Airport> airports = Arrays.stream(fileEntries)
+					.filter(entry -> idFilter.length() == 0 || entry.getId().equalsIgnoreCase(idFilter))
+					.filter(entry -> typeFilter.length() == 0 || entry.getType().equalsIgnoreCase(typeFilter))
 					.map(entry -> new Airport(
 							entry.getId(), AirportType.valueOf(entry.getType()), entry.getCode(),
 							entry.getName(), new GeoJsonPoint(entry.getLon(), entry.getLat())))
 					.collect(Collectors.toList());
 
 			Collection<Airport> inserted = this.template.insert(airports, Airport.class);
-			logger.info("Added {} airports to the database", inserted.size());
+			logger.info("Added {} airports to the database [filters: id={}, type={}]", inserted.size(), idFilter, typeFilter);
 		}
 	}
 }
