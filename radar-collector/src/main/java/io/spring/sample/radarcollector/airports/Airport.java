@@ -10,8 +10,6 @@ public class Airport {
 	@Id
 	private String id;
 
-	private AirportType type;
-
 	private String code;
 
 	private String name;
@@ -21,9 +19,7 @@ public class Airport {
 	public Airport() {
 	}
 
-	public Airport(String id, AirportType type, String code, String name, GeoJsonPoint location) {
-		this.id = id;
-		this.type = type;
+	public Airport(String code, String name, GeoJsonPoint location) {
 		this.code = code;
 		this.name = name;
 		this.location = location;
@@ -36,15 +32,7 @@ public class Airport {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	public AirportType getType() {
-		return type;
-	}
-
-	public void setType(AirportType type) {
-		this.type = type;
-	}
-
+	
 	public String getCode() {
 		return code;
 	}
@@ -73,7 +61,6 @@ public class Airport {
 	public String toString() {
 		return "Airport{" +
 				"id='" + id + '\'' +
-				", type=" + type +
 				", code='" + code + '\'' +
 				'}';
 	}

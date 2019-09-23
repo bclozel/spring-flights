@@ -2,10 +2,6 @@ package io.spring.sample.radarcollector.airports;
 
 public class AirportsFileEntry {
 
-	private String id;
-
-	private String type;
-
 	private String code;
 
 	private String name;
@@ -13,22 +9,6 @@ public class AirportsFileEntry {
 	private double lat;
 
 	private double lon;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
 
 	public String getCode() {
 		return code;

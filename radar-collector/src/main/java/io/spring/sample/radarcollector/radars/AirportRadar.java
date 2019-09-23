@@ -18,7 +18,7 @@ public class AirportRadar {
 
 	private String name;
 
-	private String iata;
+	private String code;
 
 	private LatLng location;
 
@@ -34,7 +34,7 @@ public class AirportRadar {
 
 	public AirportRadar(Airport airport, double range, int aircraftCount) {
 		this.name = airport.getName();
-		this.iata = airport.getCode();
+		this.code = airport.getCode();
 		this.location = new LatLng(airport.getLocation().getY(), airport.getLocation().getX());
 		this.range = range;
 		this.aircraftCount = aircraftCount;
@@ -53,8 +53,8 @@ public class AirportRadar {
 		return this.name;
 	}
 
-	public String getIata() {
-		return this.iata;
+	public String getCode() {
+		return this.code;
 	}
 
 	public LatLng getLocation() {
@@ -85,12 +85,12 @@ public class AirportRadar {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		AirportRadar that = (AirportRadar) o;
-		return iata.equals(that.iata);
+		return code.equals(that.code);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(iata);
+		return Objects.hash(code);
 	}
 
 	/**

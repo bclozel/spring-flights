@@ -4,8 +4,6 @@ import io.spring.sample.radarcollector.airports.Airport;
 
 public class AirportLocation {
 
-	private String type;
-
 	private String code;
 	
 	private String name;
@@ -16,18 +14,9 @@ public class AirportLocation {
 	}
 
 	public AirportLocation(Airport airport) {
-		this.type = airport.getType().toString();
 		this.code = airport.getCode();
 		this.name = airport.getName();
 		this.location = new LatLng(airport.getLocation().getY(), airport.getLocation().getX());
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getCode() {
@@ -57,7 +46,6 @@ public class AirportLocation {
 	@Override
 	public String toString() {
 		return "AirportLocation{" +
-				"type='" + type + '\'' +
 				", code='" + code + '\'' +
 				", name='" + name + '\'' +
 				", location=" + location +

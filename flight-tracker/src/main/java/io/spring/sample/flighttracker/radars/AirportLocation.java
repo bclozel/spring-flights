@@ -2,21 +2,11 @@ package io.spring.sample.flighttracker.radars;
 
 public class AirportLocation {
 
-	private String type;
-
 	private String code;
 
 	private String name;
 
 	private LatLng location;
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
 
 	public String getCode() {
 		return code;
@@ -45,7 +35,6 @@ public class AirportLocation {
 	@Override
 	public String toString() {
 		return "AirportLocation{" +
-				"type='" + type + '\'' +
 				", code='" + code + '\'' +
 				", name='" + name + '\'' +
 				", location=" + location +

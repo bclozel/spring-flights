@@ -12,14 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.geo.Box;
-import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeospatialIndex;
-import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
@@ -53,9 +49,8 @@ public class AirportRepositoryInitializer {
 					.readValue(airportsResource.getInputStream(), AirportsFileEntry[].class);
 
 			List<Airport> airports = Arrays.stream(fileEntries)
-					.map(entry -> new Airport(
-							entry.getId(), AirportType.valueOf(entry.getType()), entry.getCode(),
-							entry.getName(), new GeoJsonPoint(entry.getLon(), entry.getLat())))
+					.map(entry -> new Airport(entry.getCode(), entry.getName(),
+							new GeoJsonPoint(entry.getLon(), entry.getLat())))
 					.collect(Collectors.toList());
 
 			Collection<Airport> inserted = this.template.insert(airports, Airport.class);
