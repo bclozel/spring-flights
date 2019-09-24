@@ -17,15 +17,18 @@ public class UserProfile {
 
 	private String email;
 
+	private String avatarUrl;
+
 	private String favoriteAirport;
 
 	public UserProfile() {
 	}
 
-	UserProfile(String login, String name, String email, String favoriteAirport) {
+	public UserProfile(String login, String name, String email, String avatarUrl, String favoriteAirport) {
 		this.login = login;
 		this.name = name;
 		this.email = email;
+		this.avatarUrl = avatarUrl;
 		this.favoriteAirport = favoriteAirport;
 	}
 
@@ -51,6 +54,14 @@ public class UserProfile {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
 	}
 
 	public String getFavoriteAirport() {

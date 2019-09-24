@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "bulma": "^0.7.5",
     "leaflet": "^1.5.1",
     "leaflet-rotatedmarker": "^0.2.0",
     "rsocket-websocket-client": "0.0.10"

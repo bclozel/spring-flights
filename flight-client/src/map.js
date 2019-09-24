@@ -142,7 +142,9 @@ L.Control.BackpressureCtrl = L.Control.extend({
     },
 
     onAdd: function(map) {
-        var input = L.DomUtil.create('input', "backpressure-control");
+        let field = L.DomUtil.create('div', "field");
+        let control = L.DomUtil.create('div', "control", field);
+        let input = L.DomUtil.create('input', "input is-large", control);
         input.type = 'number';
         input.min = this.options.min;
         input.max = this.options.max;
