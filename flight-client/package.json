@@ -4,18 +4,16 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "install": "^0.12.2",
     "leaflet": "^1.5.1",
     "leaflet-rotatedmarker": "^0.2.0",
-    "npm": "^6.9.0",
     "rsocket-websocket-client": "0.0.10"
   },
   "devDependencies": {
-    "css-loader": "^3.0.0",
-    "file-loader": "^4.0.0",
+    "css-loader": "^3.2.0",
+    "file-loader": "^4.2.0",
     "style-loader": "^0.23.1",
-    "webpack": "^4.35.0",
-    "webpack-cli": "^3.3.5"
+    "webpack": "^4.40.2",
+    "webpack-cli": "^3.3.9"
   },
   "scripts": {
     "build": "webpack"
