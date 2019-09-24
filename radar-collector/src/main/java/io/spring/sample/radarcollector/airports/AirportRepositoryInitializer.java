@@ -5,18 +5,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
-import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
-import org.springframework.data.mongodb.core.index.GeospatialIndex;
 import org.springframework.data.mongodb.core.index.IndexOperations;
+import org.springframework.data.mongodb.core.index.IndexResolver;
+import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
@@ -29,20 +31,21 @@ public class AirportRepositoryInitializer {
 
 	private final MongoTemplate template;
 
+	private final MongoMappingContext mappingContext;
+
 	private final ObjectMapper objectMapper;
 
-	public AirportRepositoryInitializer(MongoTemplate template, ObjectMapper objectMapper) {
+	public AirportRepositoryInitializer(MongoTemplate template, MongoMappingContext mappingContext, ObjectMapper objectMapper) {
 		this.template = template;
+		this.mappingContext = mappingContext;
 		this.objectMapper = objectMapper;
 	}
 
-	@PostConstruct
+	@EventListener(ApplicationReadyEvent.class)
 	public void initializeAirportsDatabase() throws IOException {
-		if (!this.template.collectionExists(Airport.class)) {
-			this.template.createCollection(Airport.class);
-			IndexOperations indexOps = this.template.indexOps(Airport.class);
-			indexOps.ensureIndex(new GeospatialIndex("location").typed(GeoSpatialIndexType.GEO_2DSPHERE));
-		}
+		IndexOperations indexOps = template.indexOps(Airport.class);
+		IndexResolver resolver = new MongoPersistentEntityIndexResolver(mappingContext);
+		resolver.resolveIndexFor(Airport.class).forEach(indexOps::ensureIndex);
 		if (this.template.count(query(Criteria.where("code").exists(true)), Airport.class) == 0) {
 			ClassPathResource airportsResource = new ClassPathResource("airports.json");
 			AirportsFileEntry[] fileEntries = this.objectMapper
