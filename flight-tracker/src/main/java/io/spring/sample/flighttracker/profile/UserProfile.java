@@ -19,17 +19,17 @@ public class UserProfile {
 
 	private String avatarUrl;
 
-	private String favoriteAirport;
+	private  FavoriteAirport airport;
 
 	public UserProfile() {
 	}
 
-	public UserProfile(String login, String name, String email, String avatarUrl, String favoriteAirport) {
+	public UserProfile(String login, String name, String email, String avatarUrl, FavoriteAirport airport) {
 		this.login = login;
 		this.name = name;
 		this.email = email;
 		this.avatarUrl = avatarUrl;
-		this.favoriteAirport = favoriteAirport;
+		this.airport = airport;
 	}
 
 	public String getLogin() {
@@ -64,11 +64,11 @@ public class UserProfile {
 		this.avatarUrl = avatarUrl;
 	}
 
-	public String getFavoriteAirport() {
-		return favoriteAirport;
+	public FavoriteAirport getAirport() {
+		return airport;
 	}
 
-	public void setFavoriteAirport(String favoriteAirport) {
-		this.favoriteAirport = favoriteAirport;
+	public void setAirport(FavoriteAirport airport) {
+		this.airport = airport;
 	}
 }

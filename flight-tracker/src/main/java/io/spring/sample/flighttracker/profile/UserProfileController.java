@@ -2,11 +2,11 @@ package io.spring.sample.flighttracker.profile;
 
 import reactor.core.publisher.Mono;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.stereotype.Controller;
 
-@RestController
+@Controller
 public class UserProfileController {
 
 	private final UserProfileRepository repository;
@@ -15,8 +15,8 @@ public class UserProfileController {
 		this.repository = repository;
 	}
 
-	@GetMapping("/profile/{login}")
-	public Mono<UserProfile> fetchProfile(@PathVariable String login) {
+	@MessageMapping("fetch.profile.{login}")
+	public Mono<UserProfile> fetchProfile(@DestinationVariable String login) {
 		return this.repository.findByLogin(login);
 	}
 }
