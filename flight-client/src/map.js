@@ -1,4 +1,4 @@
-import {RadarClient} from './radars';
+import {TrackerClient} from './tracker';
 import L from "leaflet";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-rotatedmarker/leaflet.rotatedMarker'
@@ -32,7 +32,7 @@ const maxRadars = 6;
 
 export class RadarMap {
 
-    constructor(code, zoomLevel) {
+    constructor(login, zoomLevel) {
         this.L = L;
         this.map = this.L.map('map');
         var mainLayer = this.L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
@@ -50,27 +50,30 @@ export class RadarMap {
         this.signalsLayer = L.layerGroup();
         this.signalsLayer.addTo(this.map);
 
-        this.radarClient = new RadarClient('ws://localhost:8080/rsocket', new MapHandler(this.map));
-        this.radarClient.connect(() => this.displayMap(code, zoomLevel));
+        this.trackerClient = new TrackerClient('ws://localhost:8080/rsocket', new MapHandler(this.map));
+        this.trackerClient.connect()
+            .then(sub => {
+                return this.trackerClient.fetchUserProfile(login);
+            })
+            .then(profile => {
+                document.querySelector("#profile").innerHTML
+                    = `<div class="navbar-item"><span>${profile.name}</span><img src="${profile.avatarUrl}"/></div>`;
+                this.displayMap(profile, zoomLevel);
+            });
 
         this.backpressureCtrl = new L.Control.BackpressureCtrl();
         this.backpressureCtrl.addTo(this.map);
     }
 
-    displayMap(code, zoomLevel) {
-        this.radarClient.locateRadar(code).subscribe({
-            onError: error => console.error(error),
-            onComplete: msg => {
-                const radar = msg.data;
-                this.map.setView([radar.location.lat, radar.location.lng], zoomLevel);
-                this.showLiveContent();
-                this.map.on('load', this.showLiveContent, this);
-                this.map.on('movestart', this.moveStart, this);
-                this.map.on('moveend', this.updateMap, this);
-                this.map.on('zoomstart', this.moveStart, this);
-                this.map.on('zoomend', this.updateMap, this);
-            }
-        });
+    displayMap(profile, zoomLevel) {
+        const radar = profile.airport;
+        this.map.setView([radar.lat, radar.lng], zoomLevel);
+        this.showLiveContent();
+        this.map.on('load', this.showLiveContent, this);
+        this.map.on('movestart', this.moveStart, this);
+        this.map.on('moveend', this.updateMap, this);
+        this.map.on('zoomstart', this.moveStart, this);
+        this.map.on('zoomend', this.updateMap, this);
     }
 
     moveStart() {
@@ -87,48 +90,45 @@ export class RadarMap {
 
     showLiveContent() {
         const bounds = this.map.getBounds();
-        this.radarClient.locateRadars(bounds.getNorthEast(), bounds.getSouthWest(), maxRadars)
-            .subscribe({
-                onError: error => console.error(error),
-                onNext: msg => {
-                    const radar = new Radar(msg.data);
+        this.trackerClient
+            .locateRadars(bounds.getNorthEast(), bounds.getSouthWest(), maxRadars)
+            .then(data => {
+                data.forEach(r => {
+                    const radar = new Radar(r);
                     radar.addToLayer(this.radarsLayer);
                     this.radars.push(radar);
-                },
-                onComplete: () => {
-                    const radars = this.radars.map(v => {
-                        const radar = {code: v.code};
-                        return radar;
-                    });
-                    this.radarClient
-                        .streamAircraftPositions(radars)
-                        .subscribe({
-                            onError: error => {
-                                console.error(error);
-                                console.dir(error);
-                            },
-                            onNext: msg => {
-                                const data = msg.data;
-                                if (this.signals.has(data.callSign)) {
-                                    const signal = this.signals.get(data.callSign);
-                                    if (data.signalLost) {
-                                        this.signals.delete(data.callSign);
-                                        signal.removeFromLayer(this.signalsLayer);
-                                    } else {
-                                        signal.update(data);
-                                    }
+                });
+
+                const radarRequest = this.radars.map(v => {
+                    return {code: v.code};
+                });
+                this.trackerClient
+                    .streamAircraftPositions(radarRequest)
+                    .subscribe({
+                        onSubscribe: sub => {
+                            this.backpressureCtrl.useSubscription(sub);
+                        },
+                        onNext: msg => {
+                            const data = msg.data;
+                            if (this.signals.has(data.callSign)) {
+                                const signal = this.signals.get(data.callSign);
+                                if (data.signalLost) {
+                                    this.signals.delete(data.callSign);
+                                    signal.removeFromLayer(this.signalsLayer);
                                 } else {
-                                    const signal = new AircraftSignal(data);
-                                    signal.addToLayer(this.signalsLayer);
-                                    this.signals.set(signal.callSign, signal);
+                                    signal.update(data);
                                 }
-                            },
-                            onSubscribe: sub => {
-                                this.backpressureCtrl.useSubscription(sub);
+                            } else {
+                                const signal = new AircraftSignal(data);
+                                signal.addToLayer(this.signalsLayer);
+                                this.signals.set(signal.callSign, signal);
                             }
-                        });
-                },
-                onSubscribe: sub => sub.request(maxRadars),
+                        },
+                        onError: error => {
+                            console.error(error);
+                            console.dir(error);
+                        }
+                    });
             });
     }
 }
