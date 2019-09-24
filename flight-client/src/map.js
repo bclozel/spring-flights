@@ -1,4 +1,4 @@
-import {RadarClient, PartialResponder} from './radars';
+import {RadarClient} from './radars';
 import L from "leaflet";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-rotatedmarker/leaflet.rotatedMarker'
@@ -32,9 +32,9 @@ const maxRadars = 6;
 
 export class RadarMap {
 
-    constructor(coordinates, zoomLevel) {
+    constructor(code, zoomLevel) {
         this.L = L;
-        this.map = this.L.map('map').setView(coordinates, zoomLevel);
+        this.map = this.L.map('map');
         var mainLayer = this.L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
             attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
             minZoom: 1,
@@ -51,19 +51,26 @@ export class RadarMap {
         this.signalsLayer.addTo(this.map);
 
         this.radarClient = new RadarClient('ws://localhost:8080/rsocket', new MapHandler(this.map));
-        this.radarClient.connect(() => this.connectCallback());
+        this.radarClient.connect(() => this.displayMap(code, zoomLevel));
 
         this.backpressureCtrl = new L.Control.BackpressureCtrl();
         this.backpressureCtrl.addTo(this.map);
     }
 
-    connectCallback() {
-        this.showLiveContent();
-        this.map.on('load', this.showLiveContent, this);
-        this.map.on('movestart', this.moveStart, this);
-        this.map.on('moveend', this.updateMap, this);
-        this.map.on('zoomstart', this.moveStart, this);
-        this.map.on('zoomend', this.updateMap, this);
+    displayMap(code, zoomLevel) {
+        this.radarClient.locateRadar(code).subscribe({
+            onError: error => console.error(error),
+            onComplete: msg => {
+                const radar = msg.data;
+                this.map.setView([radar.location.lat, radar.location.lng], zoomLevel);
+                this.showLiveContent();
+                this.map.on('load', this.showLiveContent, this);
+                this.map.on('movestart', this.moveStart, this);
+                this.map.on('moveend', this.updateMap, this);
+                this.map.on('zoomstart', this.moveStart, this);
+                this.map.on('zoomend', this.updateMap, this);
+            }
+        });
     }
 
     moveStart() {
@@ -118,8 +125,7 @@ export class RadarMap {
                             },
                             onSubscribe: sub => {
                                 this.backpressureCtrl.useSubscription(sub);
-                            },
-
+                            }
                         });
                 },
                 onSubscribe: sub => sub.request(maxRadars),

@@ -52,6 +52,14 @@ export class RadarClient {
         });
     }
 
+    locateRadar(code) {
+        let metadata = new Metadata();
+        metadata.set(Metadata.ROUTE, `locate.radar.${code}`);
+        return this.socket.requestResponse({
+            metadata: metadata,
+        });
+    }
+
     disconnect() {
         this.cancel();
     }

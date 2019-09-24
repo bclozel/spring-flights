@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,11 @@ public class RadarsController {
 
 	public RadarsController(RadarService radarService) {
 		this.radarService = radarService;
+	}
+
+	@MessageMapping("locate.radar.{code}")
+	public Mono<AirportLocation> radar(@DestinationVariable String code) {
+		return this.radarService.findRadar(code);
 	}
 
 	@MessageMapping("locate.radars.within")
