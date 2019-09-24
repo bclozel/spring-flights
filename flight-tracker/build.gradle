@@ -23,6 +23,7 @@ dependencies {
 	runtimeOnly project(":flight-client")
 	runtimeOnly 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'io.projectreactor:reactor-tools'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
