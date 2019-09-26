@@ -18,8 +18,7 @@ public class UserProfileController {
 	}
 
 	@MessageMapping("fetch.profile.me")
-	public Mono<UserProfile> fetchProfile(@AuthenticationPrincipal Jwt jwt) {
-		String login = jwt.getClaim("preferred_username");
+	public Mono<UserProfile> fetchProfile(@AuthenticationPrincipal(expression = "claims['preferred_username']") String login) {
 		return this.repository.findByLogin(login);
 	}
 
