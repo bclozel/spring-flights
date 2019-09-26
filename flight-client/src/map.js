@@ -63,6 +63,9 @@ export class RadarMap {
 
         this.backpressureCtrl = new L.Control.BackpressureCtrl();
         this.backpressureCtrl.addTo(this.map);
+
+        this.profileCtrl = new L.Control.ProfileCtrl(this.trackerClient);
+        this.profileCtrl.addTo(this.map);
     }
 
     displayMap(profile, zoomLevel) {
@@ -155,7 +158,7 @@ L.Control.BackpressureCtrl = L.Control.extend({
                 this.subscription.request(Number.parseInt(input.value));
             }
         }, 1000);
-        return input;
+        return field;
     },
 
     useSubscription(sub) {
@@ -167,6 +170,74 @@ L.Control.BackpressureCtrl = L.Control.extend({
             this.subscription.cancel();
             this.subscription = null;
         }
+    }
+
+});
+
+/*
+<div class="field has-addons">
+  <div class="control">
+    <input class="input" type="text" placeholder="Find a repository">
+  </div>
+  <div class="control">
+    <a class="button is-info">
+      Search
+    </a>
+  </div>
+</div>
+ */
+L.Control.ProfileCtrl = L.Control.extend({
+    options: {
+        position: 'bottomright'
+    },
+
+    initialize: function (trackerClient) {
+        this.trackerClient = trackerClient;
+    },
+
+    onAdd: function(map) {
+        this.map = map;
+        let field = L.DomUtil.create('div', "field has-addons");
+        let controlInput = L.DomUtil.create('div', "control", field);
+        this.input = L.DomUtil.create('input', "input", controlInput);
+        this.input.type = 'text';
+        this.input.placeholder = 'Find another user';
+        L.DomEvent.disableClickPropagation(this.input);
+        let controlButton = L.DomUtil.create('div', "control", field);
+        this.button = L.DomUtil.create('a', "button is-info", controlButton);
+        this.button.innerHTML = 'Search';
+        L.DomEvent.disableClickPropagation(this.button);
+        L.DomEvent.on(this.button, 'click', this.showUserOnMap, this);
+        return field;
+    },
+
+    onRemove: function(map) {
+        L.DomEvent.off(this.button, 'click', this.showUserOnMap, this);
+        if (this.userMarker) {
+            this.userMarker.removeFrom(map);
+        }
+    },
+
+    showUserOnMap: function() {
+        if (this.userMarker) {
+            this.userMarker.removeFrom(this.map);
+            this.userMarker = null;
+        }
+        if (!this.input.value) {
+            return;
+        }
+        this.trackerClient.fetchPublicUserProfile(this.input.value)
+            .then(profile => {
+                let userIcon = L.icon({
+                    iconSize: [64, 64], iconUrl: profile.avatarUrl, className: "profileIcon"
+                });
+                this.userMarker = L.marker(
+                    [profile.airport.lat, profile.airport.lng],
+                    {title: `${profile.name} @ ${profile.airport.code}`, icon: userIcon, zIndexOffset: 10}
+                );
+                this.userMarker.addTo(this.map);
+                this.map.panTo([profile.airport.lat, profile.airport.lng]);
+            });
     }
 
 });
