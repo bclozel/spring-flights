@@ -32,7 +32,7 @@ const maxRadars = 6;
 
 export class RadarMap {
 
-    constructor(login, zoomLevel) {
+    constructor(zoomLevel) {
         this.L = L;
         this.map = this.L.map('map');
         var mainLayer = this.L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
@@ -53,7 +53,7 @@ export class RadarMap {
         this.trackerClient = new TrackerClient('ws://localhost:8080/rsocket', new MapHandler(this.map));
         this.trackerClient.connect()
             .then(sub => {
-                return this.trackerClient.fetchUserProfile(login);
+                return this.trackerClient.fetchUserProfile();
             })
             .then(profile => {
                 document.querySelector("#profile").innerHTML

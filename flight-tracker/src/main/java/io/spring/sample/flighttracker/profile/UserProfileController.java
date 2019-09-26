@@ -15,8 +15,14 @@ public class UserProfileController {
 		this.repository = repository;
 	}
 
+	@MessageMapping("fetch.profile.me")
+	public Mono<UserProfile> fetchProfile() {
+		// hardcoded username until authentication is here!
+		return this.repository.findByLogin("rstoyanchev");
+	}
+
 	@MessageMapping("fetch.profile.{login}")
-	public Mono<UserProfile> fetchProfile(@DestinationVariable String login) {
-		return this.repository.findByLogin(login);
+	public Mono<PublicUserProfile> fetchPublicProfile(@DestinationVariable String login) {
+		return this.repository.findByLogin(login).map(PublicUserProfile::new);
 	}
 }

@@ -75,7 +75,11 @@ export class TrackerClient {
         });
     }
 
-    fetchUserProfile(login) {
+    fetchUserProfile() {
+        return this.fetchPublicUserProfile("me");
+    }
+
+    fetchPublicUserProfile(login) {
         return new Promise((resolve, reject) => {
             let metadata = new Metadata();
             metadata.set(Metadata.ROUTE, `fetch.profile.${login}`);
