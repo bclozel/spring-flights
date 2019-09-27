@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.rsocket.PayloadInterceptorOrder;
 import org.springframework.security.config.annotation.rsocket.RSocketSecurity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.util.Map;
  * @author Rob Winch
  */
 @Configuration
+@EnableReactiveMethodSecurity
 public class RSocketSecurityConfig {
 	@Autowired
 	Friends friends;
@@ -31,7 +33,7 @@ public class RSocketSecurityConfig {
 			.authorizePayload(authz ->
 				authz
 					.route("fetch.profile.me").authenticated()
-					.route("fetch.profile.{username}").access((a,c) -> checkFriends(a, c))
+//					.route("fetch.profile.{username}").access((a,c) -> checkFriends(a, c))
 					.anyRequest().authenticated()
 					.anyExchange().permitAll()
 			)

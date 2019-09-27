@@ -1,6 +1,7 @@
 package io.spring.sample.flighttracker.profile;
 
 import io.spring.sample.flighttracker.CurrentUserProfile;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,7 @@ public class UserProfileController {
 		return currentUserProfile;
 	}
 
+	@PreAuthorize("@friends.exist(principal?.login, #login)")
 	@MessageMapping("fetch.profile.{login}")
 	public Mono<PublicUserProfile> fetchPublicProfile(@DestinationVariable String login) {
 		return this.repository.findByLogin(login).map(PublicUserProfile::new);
