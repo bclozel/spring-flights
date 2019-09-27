@@ -12,6 +12,10 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
 import org.springframework.security.rsocket.authentication.AuthenticationPayloadInterceptor;
 import org.springframework.security.rsocket.core.PayloadSocketAcceptorInterceptor;
+import org.springframework.security.rsocket.util.matcher.PayloadExchangeAuthorizationContext;
+import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 /**
  * @author Rob Winch
@@ -27,18 +31,21 @@ public class RSocketSecurityConfig {
 			.authorizePayload(authz ->
 				authz
 					.route("fetch.profile.me").authenticated()
-					.route("fetch.profile.{username}").access((a,c) ->
-						a.map(Authentication::getPrincipal)
-							.cast(UserProfile.class)
-							.map(UserProfile::getLogin)
-							.map(currentLogin -> friends.exist(currentLogin, (String) c.getVariables().get("username")))
-							.map(AuthorizationDecision::new)
-					)
+					.route("fetch.profile.{username}").access((a,c) -> checkFriends(a, c))
 					.anyRequest().authenticated()
 					.anyExchange().permitAll()
 			)
 			.addPayloadInterceptor(jwt);
 		return rsocket.build();
+	}
+
+	private Mono<AuthorizationDecision> checkFriends(Mono<Authentication> a,
+			PayloadExchangeAuthorizationContext c) {
+		return a.map(Authentication::getPrincipal)
+			.cast(UserProfile.class)
+			.map(UserProfile::getLogin)
+			.map(currentLogin -> friends.exist(currentLogin, (String) c.getVariables().get("username")))
+			.map(AuthorizationDecision::new);
 	}
 
 	@Bean
