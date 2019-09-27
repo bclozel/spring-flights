@@ -1,5 +1,6 @@
 package io.spring.sample.flighttracker.profile;
 
+import io.spring.sample.flighttracker.CurrentUserLogin;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
@@ -18,7 +19,7 @@ public class UserProfileController {
 	}
 
 	@MessageMapping("fetch.profile.me")
-	public Mono<UserProfile> fetchProfile(@AuthenticationPrincipal(expression = "claims['preferred_username']") String login) {
+	public Mono<UserProfile> fetchProfile(@CurrentUserLogin String login) {
 		return this.repository.findByLogin(login);
 	}
 
