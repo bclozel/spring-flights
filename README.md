@@ -32,24 +32,10 @@ generated and the list of radars is inserted in a MongoDB database.
 
 The application starts an RSocket server with TCP transport, at `localhost:9898`.
 
-You can get a list of airports located inside specific coordinates,
-using the [rsocket-cli](https://github.com/rsocket/rsocket-cli):
+Currently you cannot use the [rsocket-cli](https://github.com/rsocket/rsocket-cli) because it
+does not yet support composite metadata. However you can use the following tests...
 
-```
-rsocket-cli --stream \
---metadataFormat=application/vnd.spring.rsocket.metadata+json -m=locate.radars.within \
---dataFormat=json -i='{"first":{"lng": 3.878915, "lat": 46.409025}, "second": {"lng": 6.714843, "lat": 44.365644}}' \
---debug tcp://localhost:9898/
-```
-
-You can also get a stream of aircraft locations for a given radar, with:
-
-```
-rsocket-cli --stream --metadataFormat=application/vnd.spring.rsocket.metadata+json -m=listen.radar.LYS \
---dataFormat=json -i "" 
---debug tcp://localhost:9898/
-```
-
+TODO: link to tests for locate.radars.within and listen.radar.LYS
 
 ### Flight Tracker
 
@@ -64,7 +50,7 @@ The browser will first locate all radars in the current view box; you can do the
 
 ```
 rsocket-cli --stream \
---metadataFormat=application/vnd.spring.rsocket.metadata+json -m=locate.radars.within \
+--metadataFormat=application/vnd.spring.rsocket.metadata+json -m='{"route":"locate.radars.within"}' \
 --dataFormat=json -i='{"viewBox": {"first":{"lng": 3.878915, "lat": 46.409025}, "second": {"lng": 6.714843, "lat": 44.365644}}, "maxRadars": 10}' \
 --debug ws://localhost:8080/rsocket
 ```
@@ -73,7 +59,7 @@ Once all the radars are retrieved, we can ask a merged stream of all aircrafts f
 
 ```
 rsocket-cli --stream \
---metadataFormat=application/vnd.spring.rsocket.metadata+json -m=locate.aircrafts.for \
+--metadataFormat=application/vnd.spring.rsocket.metadata+json -m='{"route":"locate.aircrafts.for"}' \
 --dataFormat=json -i='[{"code":"LYS"}, {"code":"CVF"}, {"code":"NCY"}]' \
 --debug ws://localhost:8080/rsocket
 ```
