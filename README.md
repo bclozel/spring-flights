@@ -36,14 +36,18 @@ You can get a list of airports located inside specific coordinates,
 using the [rsocket-cli](https://github.com/rsocket/rsocket-cli):
 
 ```
-rsocket-cli --stream --metadataFormat=message/x.rsocket.routing.v0 -m=locate.radars.within --dataFormat=json \
--i='{"first":{"lng": 3.878915, "lat": 46.409025}, "second": {"lng": 6.714843, "lat": 44.365644}}' tcp://localhost:9898/
+rsocket-cli --stream \
+--metadataFormat=application/vnd.spring.rsocket.metadata+json -m=locate.radars.within \
+--dataFormat=json -i='{"first":{"lng": 3.878915, "lat": 46.409025}, "second": {"lng": 6.714843, "lat": 44.365644}}' \
+--debug tcp://localhost:9898/
 ```
 
 You can also get a stream of aircraft locations for a given radar, with:
 
 ```
-rsocket-cli --stream --metadataFormat=message/x.rsocket.routing.v0 -m=listen.radar.LYS --dataFormat=json -i "" tcp://localhost:9898/
+rsocket-cli --stream --metadataFormat=application/vnd.spring.rsocket.metadata+json -m=listen.radar.LYS \
+--dataFormat=json -i "" 
+--debug tcp://localhost:9898/
 ```
 
 
@@ -59,15 +63,19 @@ from [rsocket-js](https://github.com/rsocket/rsocket-js/).
 The browser will first locate all radars in the current view box; you can do the same on the CLI with:
 
 ```
-rsocket-cli --stream --metadataFormat=message/x.rsocket.routing.v0 -m=locate.radars.within --dataFormat=json \
--i='{"viewBox": {"first":{"lng": 3.878915, "lat": 46.409025}, "second": {"lng": 6.714843, "lat": 44.365644}}, "maxRadars": 10}' ws://localhost:8080/rsocket
+rsocket-cli --stream \
+--metadataFormat=application/vnd.spring.rsocket.metadata+json -m=locate.radars.within \
+--dataFormat=json -i='{"viewBox": {"first":{"lng": 3.878915, "lat": 46.409025}, "second": {"lng": 6.714843, "lat": 44.365644}}, "maxRadars": 10}' \
+--debug ws://localhost:8080/rsocket
 ```
 
 Once all the radars are retrieved, we can ask a merged stream of all aircrafts for those radars to the server.
 
 ```
-rsocket-cli --stream --metadataFormat=message/x.rsocket.routing.v0 -m=locate.aircrafts.for --dataFormat=json \
--i='[{"iata":"LYS"}, {"iata":"CVF"}, {"iata":"NCY"}]' ws://localhost:8080/rsocket
+rsocket-cli --stream \
+--metadataFormat=application/vnd.spring.rsocket.metadata+json -m=locate.aircrafts.for \
+--dataFormat=json -i='[{"code":"LYS"}, {"code":"CVF"}, {"code":"NCY"}]' \
+--debug ws://localhost:8080/rsocket
 ```
 
 The browser will perform such a request and update the aircrafts positions live.
