@@ -13,6 +13,9 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Generate and cache locally {@link AircraftTrace} for multiple {@link AirportRadar}.
+ */
 @Component
 public class AircraftTraceGenerator {
 

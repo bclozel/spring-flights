@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.springframework.data.geo.Point;
 
+/**
+ * Latitude and Longitude data.
+ */
 public class LatLng {
 
 	private double lat;

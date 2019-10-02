@@ -10,6 +10,10 @@ import io.spring.sample.radarcollector.airports.Airport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Radar located at an {@link AirportLocation} and tracking {@link AircraftTrace}
+ * that are within its range.
+ */
 public class AirportRadar {
 
 	private static final Logger logger = LoggerFactory.getLogger(AirportRadar.class);

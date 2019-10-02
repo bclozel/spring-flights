@@ -7,7 +7,13 @@ import java.time.ZoneOffset;
 import java.util.Random;
 
 /**
- * <a href="https://www.movable-type.co.uk/scripts/latlong.html">LatLng resources</a>.
+ * Aircraft data and position over time.
+ * <p>This class can create a random aircraft given a {@link LatLng} position:
+ * random flight number, bearing and speed.
+ * <p>This class is using various resources, including the
+ * <a href="https://rosettacode.org/wiki/Haversine_formula#Java">Haversine Formula</a>
+ * and <a href="https://www.movable-type.co.uk/scripts/latlong.html">LatLng resources</a>,
+ * to calculate distances and positions of the aircraft over time.
  */
 public class AircraftTrace {
 
@@ -88,7 +94,6 @@ public class AircraftTrace {
 	}
 
 	public double distanceFromPoint(LatLng pointLocation) {
-		// See https://rosettacode.org/wiki/Haversine_formula#Java
 		double dLat = Math.toRadians(pointLocation.getLat() - this.location.getLat());
 		double dLon = Math.toRadians(pointLocation.getLng() - this.location.getLng());
 		double traceLat = this.location.getLatRad();
@@ -146,7 +151,7 @@ public class AircraftTrace {
 		return createAtDistanceFromReferencePoint(referenceLocation, RANDOM.nextDouble() * distance);
 	}
 
-	private static LatLng calculateDestination(LatLng location, double bearing, double distance) {
+	static LatLng calculateDestination(LatLng location, double bearing, double distance) {
 		double startLat = location.getLatRad();
 		double startLng = location.getLngRad();
 		double angularDistance = distance / EARTH_RADIUS;
@@ -159,14 +164,7 @@ public class AircraftTrace {
 				(Math.toDegrees(endLng) + 540) % 360 - 180);
 	}
 
-	public static double calculateBearing(LatLng start, LatLng end) {
-		/*
-		var y = Math.sin(λ2-λ1) * Math.cos(φ2);
-var x = Math.cos(φ1)*Math.sin(φ2) -
-        Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
-var brng = Math.atan2(y, x).toDegrees();
-		 */
-
+	static double calculateBearing(LatLng start, LatLng end) {
 		double startLat = start.getLatRad();
 		double startLng = start.getLngRad();
 		double endLat = end.getLatRad();

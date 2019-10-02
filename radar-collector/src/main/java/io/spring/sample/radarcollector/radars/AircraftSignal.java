@@ -2,18 +2,24 @@ package io.spring.sample.radarcollector.radars;
 
 import java.time.Instant;
 
+/**
+ * A single signal from an existing {@link AircraftTrace}.
+ * Once out of range, the signal is marked as lost for the {@link AirportRadar}.
+ */
 public class AircraftSignal {
 
-	private final String callSign;
+	private String callSign;
 
-	private final LatLng location;
+	private LatLng location;
 
-	private final double bearing;
+	private double bearing;
 
-	private final Instant captureTime;
+	private Instant captureTime;
 
 	private boolean signalLost;
 
+	AircraftSignal() {
+	}
 
 	public AircraftSignal(AircraftTrace trace) {
 		this.callSign = trace.getCallSign();
@@ -45,5 +51,16 @@ public class AircraftSignal {
 
 	public void setSignalLost(boolean signalLost) {
 		this.signalLost = signalLost;
+	}
+
+	@Override
+	public String toString() {
+		return "AircraftSignal{" +
+				"callSign='" + callSign + '\'' +
+				", location=" + location +
+				", bearing=" + bearing +
+				", captureTime=" + captureTime +
+				", signalLost=" + signalLost +
+				'}';
 	}
 }

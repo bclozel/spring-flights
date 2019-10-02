@@ -2,6 +2,9 @@ package io.spring.sample.radarcollector.radars;
 
 import io.spring.sample.radarcollector.airports.Airport;
 
+/**
+ * Location of an airport.
+ */
 public class AirportLocation {
 
 	private String code;
@@ -46,7 +49,7 @@ public class AirportLocation {
 	@Override
 	public String toString() {
 		return "AirportLocation{" +
-				", code='" + code + '\'' +
+				"code='" + code + '\'' +
 				", name='" + name + '\'' +
 				", location=" + location +
 				'}';

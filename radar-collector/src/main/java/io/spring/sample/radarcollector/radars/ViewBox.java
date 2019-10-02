@@ -2,7 +2,9 @@ package io.spring.sample.radarcollector.radars;
 
 import org.springframework.data.geo.Box;
 
-
+/**
+ * Pair of {@link LatLng} coordinates marking a rectangular-shaped zone on the globe.
+ */
 public class ViewBox {
 
 	private LatLng first;
