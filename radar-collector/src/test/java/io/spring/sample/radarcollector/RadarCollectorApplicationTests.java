@@ -1,6 +1,7 @@
 package io.spring.sample.radarcollector;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import io.spring.sample.radarcollector.radars.AircraftSignal;
@@ -10,6 +11,8 @@ import io.spring.sample.radarcollector.radars.ViewBox;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.rsocket.metadata.BasicAuthenticationEncoder;
+import org.springframework.security.rsocket.metadata.UsernamePasswordMetadata;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -20,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.rsocket.RSocketRequester;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.rsocket.metadata.UsernamePasswordMetadata.BASIC_AUTHENTICATION_MIME_TYPE;
 
 @SpringBootTest(properties = "spring.rsocket.server.port=0")
 class RadarCollectorApplicationTests {
@@ -33,8 +37,23 @@ class RadarCollectorApplicationTests {
 	private int port;
 
 	@Test
+	public void authenticationRequired() {
+		Mono<RSocketRequester> requester = this.requesterBuilder
+				.dataMimeType(MediaType.APPLICATION_CBOR)
+				.connectTcp("localhost", this.port);
+
+		Mono<AirportLocation> airport = requester.flatMap(req ->
+				req.route("find.radar.{code}", "LYS")
+						.retrieveMono(AirportLocation.class));
+
+		StepVerifier.create(airport)
+				.verifyError();
+	}
+
+	@Test
 	void findRadarByCode() {
 		Mono<RSocketRequester> requester = this.requesterBuilder
+				.apply(credentials())
 				.dataMimeType(MediaType.APPLICATION_CBOR)
 				.connectTcp("localhost", this.port);
 
@@ -54,6 +73,7 @@ class RadarCollectorApplicationTests {
 	@Test
 	void findRadarWithinViewBox() {
 		Mono<RSocketRequester> requester = this.requesterBuilder
+				.apply(credentials())
 				.dataMimeType(MediaType.APPLICATION_CBOR)
 				.connectTcp("localhost", this.port);
 
@@ -77,6 +97,7 @@ class RadarCollectorApplicationTests {
 	@Test
 	public void streamAircraftSignalsForAirport() {
 		Mono<RSocketRequester> requester = this.requesterBuilder
+				.apply(credentials())
 				.dataMimeType(MediaType.APPLICATION_CBOR)
 				.connectTcp("localhost", this.port);
 
@@ -96,4 +117,8 @@ class RadarCollectorApplicationTests {
 				.verifyComplete();
 	}
 
+	private static Consumer<RSocketRequester.Builder> credentials() {
+		return r -> r.rsocketStrategies(builder -> builder.encoder(new BasicAuthenticationEncoder()))
+					.setupMetadata(new UsernamePasswordMetadata("user", "password"), BASIC_AUTHENTICATION_MIME_TYPE);
+	}
 }
