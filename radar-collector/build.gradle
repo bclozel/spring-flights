@@ -24,6 +24,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-rsocket'
 	implementation 'com.github.ben-manes.caffeine:caffeine'
 	runtimeOnly 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+	runtimeOnly 'io.projectreactor:reactor-tools'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
