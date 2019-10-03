@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 
 import io.spring.sample.flighttracker.profile.UserProfile;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.security.oauth2.client.endpoint.OAuth2PasswordGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.WebClientReactivePasswordTokenResponseClient;
@@ -36,8 +38,16 @@ class FlightTrackerApplicationTests {
 	private URI uri;
 
 	@Test
-	void fetchProfileMe() {
-		String login = "rossen";
+	void fetchProfileMeWhenRossenThenRossen() {
+		fetchProfileMeAndAssert("rossen");
+	}
+
+	@Test
+	void fetchProfileMeWhenBrianThenBrian() {
+		fetchProfileMeAndAssert("brian");
+	}
+
+	private void fetchProfileMeAndAssert(String login) {
 
 		Mono<RSocketRequester> requester = this.requesterBuilder
 				.apply(this.oauth2.tokenForLogin(login))

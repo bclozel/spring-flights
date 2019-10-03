@@ -1,5 +1,7 @@
 package io.spring.sample.flighttracker.profile;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -16,9 +18,9 @@ public class UserProfileController {
 	}
 
 	@MessageMapping("fetch.profile.me")
-	public Mono<UserProfile> fetchProfile() {
-		// hardcoded username until authentication is here!
-		return this.repository.findByLogin("rossen");
+	public Mono<UserProfile> fetchProfile(@AuthenticationPrincipal Jwt jwt) {
+		String login = jwt.getClaim("preferred_username");
+		return this.repository.findByLogin(login);
 	}
 
 	@MessageMapping("fetch.profile.{login}")
