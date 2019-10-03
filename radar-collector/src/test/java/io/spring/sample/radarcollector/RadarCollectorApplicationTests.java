@@ -1,7 +1,10 @@
 package io.spring.sample.radarcollector;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import io.spring.sample.radarcollector.radars.AircraftSignal;
 import io.spring.sample.radarcollector.radars.AirportLocation;
 import io.spring.sample.radarcollector.radars.LatLng;
 import io.spring.sample.radarcollector.radars.ViewBox;
@@ -68,6 +71,32 @@ class RadarCollectorApplicationTests {
 				.assertNext(list -> {
 					logger.info("Fetched airports {}", list);
 					assertThat(list).extracting(AirportLocation::getCode).contains("LYS", "LYN");
+				})
+				.verifyComplete();
+	}
+
+	@Test
+	public void streamAircraftSignalsForAirport() {
+		Mono<RSocketRequester> requester = this.requesterBuilder
+				.dataMimeType(MediaType.APPLICATION_CBOR)
+				.connectTcp("localhost", this.port);
+
+		AirportLocation lys = requester.flatMap(req ->
+				req.route("find.radar.{code}", "LYS")
+						.retrieveMono(AirportLocation.class)).block(Duration.ofSeconds(5));
+
+		Mono<List<AircraftSignal>> signals = requester.flatMapMany(req ->
+				req.route("listen.radar.{code}", lys.getCode())
+						.retrieveFlux(AircraftSignal.class))
+				.take(20)
+				.collectList();
+
+		Pattern callSignPattern = Pattern.compile("[A-Z]{2}[0-9]{3}");
+
+		StepVerifier.create(signals)
+				.assertNext(list -> {
+					logger.info("Fetched signals {}", list);
+					assertThat(list).extracting(AircraftSignal::getCallSign).allMatch(callSignPattern.asPredicate());
 				})
 				.verifyComplete();
 	}
