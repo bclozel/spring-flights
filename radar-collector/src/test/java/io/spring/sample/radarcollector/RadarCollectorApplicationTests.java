@@ -1,6 +1,10 @@
 package io.spring.sample.radarcollector;
 
+import java.util.List;
+
 import io.spring.sample.radarcollector.radars.AirportLocation;
+import io.spring.sample.radarcollector.radars.LatLng;
+import io.spring.sample.radarcollector.radars.ViewBox;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +24,17 @@ class RadarCollectorApplicationTests {
 
 	private static Logger logger = LoggerFactory.getLogger(RadarCollectorApplicationTests.class);
 
+	@Autowired
+	private RSocketRequester.Builder requesterBuilder;
+
+	@LocalRSocketServerPort
+	private int port;
+
 	@Test
-	void findRadarByCode(@Autowired RSocketRequester.Builder requesterBuilder, @LocalRSocketServerPort int port) {
-		Mono<RSocketRequester> requester = requesterBuilder
+	void findRadarByCode() {
+		Mono<RSocketRequester> requester = this.requesterBuilder
 				.dataMimeType(MediaType.APPLICATION_CBOR)
-				.connectTcp("localhost", port);
+				.connectTcp("localhost", this.port);
 
 		Mono<AirportLocation> airport = requester.flatMap(req ->
 				req.route("find.radar.{code}", "LYS")
@@ -35,6 +45,29 @@ class RadarCollectorApplicationTests {
 					logger.info("Airport found for code 'LYS': {}", airportLocation);
 					assertThat(airportLocation.getCode()).isEqualTo("LYS");
 					assertThat(airportLocation.getName()).isEqualTo("Lyon Saint-Exupery Airport");
+				})
+				.verifyComplete();
+	}
+
+	@Test
+	void findRadarWithinViewBox() {
+		Mono<RSocketRequester> requester = this.requesterBuilder
+				.dataMimeType(MediaType.APPLICATION_CBOR)
+				.connectTcp("localhost", this.port);
+
+		ViewBox viewBox = new ViewBox(new LatLng(45.9372734, 4.3803839),
+				new LatLng(45.3887426, 5.5078417));
+
+		Mono<List<AirportLocation>> airports = requester.flatMapMany(req ->
+				req.route("locate.radars.within")
+						.data(viewBox)
+						.retrieveFlux(AirportLocation.class))
+				.collectList();
+
+		StepVerifier.create(airports)
+				.assertNext(list -> {
+					logger.info("Fetched airports {}", list);
+					assertThat(list).extracting(AirportLocation::getCode).contains("LYS", "LYN");
 				})
 				.verifyComplete();
 	}
