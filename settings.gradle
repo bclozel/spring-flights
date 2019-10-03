@@ -13,4 +13,4 @@ pluginManagement {
 	}
 }
 rootProject.name = 'spring-flights'
-include 'demo-backpressure'
+include 'demo-backpressure', 'radar-collector'
