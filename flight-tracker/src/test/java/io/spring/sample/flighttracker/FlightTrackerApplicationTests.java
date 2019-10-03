@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.spring.sample.flighttracker.config.JsonMetadataStrategiesCustomizer;
 import io.spring.sample.flighttracker.profile.UserProfile;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -83,6 +81,34 @@ class FlightTrackerApplicationTests {
 
 		StepVerifier.create(profile)
 				.verifyError();
+	}
+
+	public void brianFetchRossen() {
+		String fetchProfileLogin = "rossen";
+		StepVerifier.create(loginWithToFetchProfileFor("brian", fetchProfileLogin))
+				.assertNext(userProfile -> {
+					assertThat(userProfile.getLogin()).isEqualTo(fetchProfileLogin);
+				})
+				.verifyComplete();
+	}
+
+	@Test
+	public void robFetchRossen() {
+		String fetchProfileLogin = "rossen";
+		StepVerifier.create(loginWithToFetchProfileFor("rob", fetchProfileLogin))
+				.verifyErrorSatisfies(e -> assertThat(e).hasMessageContaining("Denied"));
+	}
+
+	private Mono<UserProfile> loginWithToFetchProfileFor(String loginWith, String fetchProfileLogin) {
+		Mono<RSocketRequester> requester = this.requesterBuilder
+				.apply(this.oauth2.tokenForLogin(loginWith))
+				.dataMimeType(MediaType.APPLICATION_CBOR)
+				.connectWebSocket(this.uri);
+
+		return requester.flatMap(req ->
+				req.route("fetch.profile.{login}", fetchProfileLogin)
+						.retrieveMono(UserProfile.class)
+		);
 	}
 
 	@LocalServerPort
