@@ -9,6 +9,6 @@ import java.lang.annotation.RetentionPolicy;
  * @author Rob Winch
  */
 @Retention(RetentionPolicy.RUNTIME)
-@AuthenticationPrincipal(expression = "claims['preferred_username']")
-public @interface CurrentUserLogin {
+@AuthenticationPrincipal
+public @interface CurrentUserProfile {
 }

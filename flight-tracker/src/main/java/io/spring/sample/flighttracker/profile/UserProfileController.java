@@ -1,8 +1,7 @@
 package io.spring.sample.flighttracker.profile;
 
-import io.spring.sample.flighttracker.CurrentUserLogin;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import io.spring.sample.flighttracker.CurrentUserProfile;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import reactor.core.publisher.Mono;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -19,8 +18,8 @@ public class UserProfileController {
 	}
 
 	@MessageMapping("fetch.profile.me")
-	public Mono<UserProfile> fetchProfile(@CurrentUserLogin String login) {
-		return this.repository.findByLogin(login);
+	public Mono<UserProfile> fetchProfile(@CurrentUserProfile Mono<UserProfile> currentUserProfile) {
+		return currentUserProfile;
 	}
 
 	@MessageMapping("fetch.profile.{login}")

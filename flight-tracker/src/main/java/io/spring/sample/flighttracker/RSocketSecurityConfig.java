@@ -28,8 +28,10 @@ public class RSocketSecurityConfig {
 	}
 
 	@Bean
-	AuthenticationPayloadInterceptor jwt(ReactiveJwtDecoder decoder, MetadataExtractorBearerTokenConverter bearerTokenConverter) {
+	AuthenticationPayloadInterceptor jwt(ReactiveJwtDecoder decoder, MetadataExtractorBearerTokenConverter bearerTokenConverter,
+			UserProfileAuthenticationConverter converter) {
 		JwtReactiveAuthenticationManager manager = new JwtReactiveAuthenticationManager(decoder);
+		manager.setJwtAuthenticationConverter(converter);
 		AuthenticationPayloadInterceptor result = new AuthenticationPayloadInterceptor(manager);
 		result.setAuthenticationConverter(bearerTokenConverter);
 		result.setOrder(PayloadInterceptorOrder.JWT_AUTHENTICATION.getOrder());
