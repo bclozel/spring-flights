@@ -1,0 +1,33 @@
+plugins {
+    id 'com.moowork.node' version '1.3.1'
+}
+
+apply plugin: 'java'
+apply plugin: 'com.moowork.node'
+
+group = 'io.spring.sample'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+node {
+    version = '10.16.0'
+    npmVersion = '6.9.0'
+    download = true
+}
+
+jar {
+    from 'dist'
+    eachFile { details ->
+        details.path = details.path.startsWith('META-INF') ?: 'static/'+details.path
+    }
+    includeEmptyDirs = false
+}
+
+task npmBuild(dependsOn: npmInstall, type: NpmTask) {
+    inputs.file 'package.json'
+    inputs.dir('src')
+    outputs.dir 'dist'
+    args = ['run', 'build']
+}
+
+jar.dependsOn npmBuild
