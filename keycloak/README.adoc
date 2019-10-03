@@ -1,0 +1,20 @@
+= Keycloak
+
+This folder contains the necessary setup to run https://hub.docker.com/r/jboss/keycloak/[Keycloak Docker image] to provide an OAuth2 Authorization server.
+Running https://www.keycloak.org/[Keycloak] is not necessary until the spring-flights application is secured using JWTs.
+
+== Setup
+
+To run the sample, ensure you have https://docs.docker.com/install/[docker installed].
+
+TIP: If you are using Ubuntu, you can use `./ubuntu-install-docker.sh`
+
+== Running the Keycloak Docker Image
+
+* Once docker is installed, you can run `./keycloak.sh` which will start keycloak container and make keycloak available on port `9999`.
+* Start up the applications
+* You can login with the `username`/``password``s:
+** `user` and the password `password`.
+*** `brian`/`password`
+*** `rossen`/`password`
+*** `rob`/`password`
