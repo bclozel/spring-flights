@@ -14,8 +14,11 @@ public class RadarsController {
 
 	private final AirportRepository airportRepository;
 
-	public RadarsController(AirportRepository airportRepository) {
+	private final AircraftTraceGenerator generator;
+
+	public RadarsController(AirportRepository airportRepository, AircraftTraceGenerator generator) {
 		this.airportRepository = airportRepository;
+		this.generator = generator;
 	}
 
 	@MessageMapping("find.radar.{code}")
@@ -30,6 +33,14 @@ public class RadarsController {
 		return this.airportRepository
 				.findByLocationWithin(box.toGeoBox(), PageRequest.of(0, 50))
 				.map(AirportLocation::new);
+	}
+
+	@MessageMapping("listen.radar.{code}")
+	public Flux<AircraftSignal> listenToRadar(@DestinationVariable String code) {
+		return this.airportRepository
+				.findByCode(code.toUpperCase())
+				.flatMapMany(this.generator::generateForAirport)
+				.map(AircraftSignal::new);
 	}
 
 }
