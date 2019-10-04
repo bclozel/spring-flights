@@ -17,15 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FlightTrackerApplicationTests {
+	@Autowired
+	private RSocketRequester.Builder requesterBuilder;
+
+	private URI uri;
 
 	@Test
-	void fetchProfileMe(@Autowired RSocketRequester.Builder builder, @LocalServerPort int port) {
-		URI uri = URI.create("ws://localhost:" + port + "/rsocket");
+	void fetchProfileMe() {
 		String login = "rossen";
 
-		Mono<RSocketRequester> requester = builder
+		Mono<RSocketRequester> requester = this.requesterBuilder
 				.dataMimeType(MediaType.APPLICATION_CBOR)
-				.connectWebSocket(uri);
+				.connectWebSocket(this.uri);
 
 		Mono<UserProfile> profile = requester.flatMap(req ->
 				req.route("fetch.profile.me")
@@ -39,4 +42,8 @@ class FlightTrackerApplicationTests {
 				.verifyComplete();
 	}
 
+	@LocalServerPort
+	public void setPort(int port) {
+		this.uri = URI.create("ws://localhost:" + port + "/rsocket");
+	}
 }
